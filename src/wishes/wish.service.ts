@@ -6,15 +6,15 @@ import {
 } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WishesEntity } from './wish.entity';
+import { WishEntity } from './wish.entity';
 import { In, Repository } from 'typeorm';
 import { UpdateWishDto } from './dto/update-wish.dto';
 
 @Injectable()
 export class WishService {
   constructor(
-    @InjectRepository(WishesEntity)
-    private readonly wishesRepository: Repository<WishesEntity>,
+    @InjectRepository(WishEntity)
+    private readonly wishesRepository: Repository<WishEntity>,
   ) {}
 
   async getAllByUserId(userId: number) {
@@ -102,6 +102,15 @@ export class WishService {
   }
 
   async copy(id: number, userId: number) {
+    const wishFromBase = await this.wishesRepository.findOne({
+      where: { id },
+      relations: ['owner', 'offers'],
+    });
+
+    if (!wishFromBase) {
+      throw new BadRequestException('Подарок не найден');
+    }
+
     const wish = await this.getOne(id);
     wish.copied++;
 

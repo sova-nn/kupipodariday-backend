@@ -3,19 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OfferEntity } from './offer.entity';
 import { Repository } from 'typeorm';
 import { WishService } from 'src/wishes/wish.service';
-import { IsBoolean, IsInt, IsOptional } from 'class-validator';
-
-export class CreateOffersDto {
-  @IsInt()
-  amount: number;
-
-  @IsOptional()
-  @IsBoolean()
-  hidden: false;
-
-  @IsInt()
-  itemId: number;
-}
+import { CreateOfferDto } from "./create-offer.dto";
 
 @Injectable()
 export class OfferService {
@@ -25,7 +13,7 @@ export class OfferService {
     private readonly wishesService: WishService,
   ) {}
 
-  async create(userId: number, dto: CreateOffersDto) {
+  async create(userId: number, dto: CreateOfferDto) {
     await this.wishesService.addRaised(dto.itemId, dto.amount, userId);
 
     const offer = this.offersRepository.create({

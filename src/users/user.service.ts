@@ -26,6 +26,26 @@ export class UserService {
   }
 
   async create(dto: SignUpDto) {
+    const userFromBase = await this.usersRepository.findOne({
+      where: [
+        { email: dto.email },
+        { username: dto.username },
+      ],
+    });
+
+    if (userFromBase) {
+      if (userFromBase.email === dto.email) {
+        throw new BadRequestException(
+          'Пользователь с такой почтой уже существует',
+        );
+      }
+      if (userFromBase.username === dto.username) {
+        throw new BadRequestException(
+          'Пользователь с таким username уже существует',
+        );
+      }
+    }
+
     const user = this.usersRepository.create(dto);
     return this.usersRepository.save(user);
   }
